@@ -1,0 +1,14 @@
+- name: create ext volume for data
+  file: state=directory path={{ ext_hadoop_volume }}
+
+- name: create ext volume for configs
+  file: state=directory path={{ ext_hadoop_conf_volume }}
+
+- name: check if a hdfs-namenode container is started
+  command: bash -c "docker ps | grep hdfs-namenode"
+  ignore_errors: True
+  register: result
+
+- name: start an hdfs-namenode container
+  command: docker run -d -h {{ ansible_hostname }}  --dns {{ ansible_docker0.ipv4.address }} --dns 8.8.8.8 --dns-search node.dc1.consul  -p={{ namenode_http_port }}:{{ namenode_http_port }} -p={{ namenode_rpc_port }}:{{ namenode_rpc_port }} -v {{ ext_hadoop_volume }}:/var/hadoop -v {{ ext_hadoop_conf_volume }}:/hadoop/conf -name hdfs-namenode gitinsky/hdfs-namenode:0.1.0
+  when: result|failed
