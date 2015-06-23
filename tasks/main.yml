@@ -10,7 +10,17 @@
   register: result
 
 - name: start an hdfs-namenode container
-  command: docker run -d {% if docker_net_false|default(False) %} -n=false -v {{ ext_hadoop_conf_volume }}/hosts:/etc/hosts {% endif %} -h {{ ansible_hostname }}{% if docker_net_false|default(False) %}-nn{% endif %} --dns {{ ansible_docker0.ipv4.address }} --dns {{ docker_dns_2 }} --dns-search node.dc1.consul  -p={{ namenode_http_port }}:{{ namenode_http_port }} -p={{ namenode_rpc_port }}:{{ namenode_rpc_port }} -v {{ ext_hadoop_volume }}:/var/hadoop -v {{ ext_hadoop_conf_volume }}:/hadoop/conf -name hdfs-namenode gitinsky/hdfs-namenode:0.1.1
+  command: docker run -d
+              {% if docker_net_false|default(False) %} -n=false -v {{ ext_hadoop_conf_volume }}/hosts:/etc/hosts {% endif %}
+              -h {{ ansible_hostname }}{% if docker_net_false|default(False) %}-nn{% endif %}
+              --dns {{ ansible_docker0.ipv4.address }}
+              --dns {{ docker_dns_2 }}
+              --dns-search node.dc1.consul
+              -p={{ namenode_http_port }}:{{ namenode_http_port }}
+              -p={{ namenode_rpc_port }}:{{ namenode_rpc_port }}
+              -v {{ ext_hadoop_volume }}:/var/hadoop
+              -v {{ ext_hadoop_conf_volume }}:/hadoop/conf
+              --name=hdfs-namenode gitinsky/hdfs-namenode:0.1.2
   register: docker_id
   when: result|failed
 
